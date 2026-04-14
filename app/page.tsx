@@ -1,8 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { LocalizationState } from "@/lib/localization";
+import { GitlabConfig, gitlabConfigSchema } from "@/lib/gitlab-config";
 import { Toolbar } from "./components/Toolbar";
+import { Sidebar } from "./components/Sidebar";
 import { TranslationTable } from "./components/TranslationTable";
 import { BottomBar } from "./components/BottomBar";
 
@@ -53,9 +57,26 @@ export default function Home() {
   const [version, setVersion] = useState(VERSIONS[0]);
   const [state, setState] = useState<LocalizationState>(EMPTY_STATE);
   const [isDirty, setIsDirty] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const handleFetch = () => {
-    // Simulate fetching data
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<GitlabConfig>({
+    resolver: zodResolver(gitlabConfigSchema),
+    defaultValues: {
+      endpoint: "",
+      projectId: "",
+      arbFilepaths: "",
+      accessToken: "",
+    },
+    mode: "onChange",
+  });
+
+  const onFetch = (data: GitlabConfig) => {
+    // TODO: use validated `data` for actual GitLab fetch
+    console.log("Fetching with config:", data);
     setState(DEMO_STATE);
     setIsDirty(false);
   };
@@ -84,12 +105,21 @@ export default function Home() {
         version={version}
         versions={VERSIONS}
         onVersionChange={setVersion}
-        onFetch={handleFetch}
+        onFetch={handleSubmit(onFetch)}
         onImport={handleImport}
+        sidebarOpen={sidebarOpen}
+        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
       />
 
+      {/* Sidebar */}
+      <Sidebar register={register} errors={errors} isOpen={sidebarOpen} />
+
       {/* Main Content */}
-      <main className="pt-14 pb-14">
+      <main
+        className={`pt-14 pb-14 transition-all duration-200 ${
+          sidebarOpen ? "pl-64" : "pl-0"
+        }`}
+      >
         <TranslationTable state={state} onStateChange={handleStateChange} />
       </main>
 

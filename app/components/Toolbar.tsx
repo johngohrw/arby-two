@@ -4,8 +4,10 @@ interface ToolbarProps {
   version: string;
   versions: string[];
   onVersionChange: (version: string) => void;
-  onFetch: () => void;
+  onFetch: React.MouseEventHandler<HTMLButtonElement>;
   onImport: () => void;
+  sidebarOpen: boolean;
+  onToggleSidebar: () => void;
 }
 
 export function Toolbar({
@@ -14,9 +16,34 @@ export function Toolbar({
   onVersionChange,
   onFetch,
   onImport,
+  sidebarOpen,
+  onToggleSidebar,
 }: ToolbarProps) {
   return (
     <div className="fixed top-0 left-0 right-0 h-14 bg-gray-900 border-b border-gray-800 flex items-center px-4 gap-6 z-50">
+      {/* Sidebar Toggle */}
+      <button
+        onClick={onToggleSidebar}
+        className="p-2 rounded bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-gray-200 transition-colors"
+        title={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+      >
+        <svg
+          className={`w-4 h-4 transition-transform duration-200 ${sidebarOpen ? "" : "rotate-180"}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
+          />
+        </svg>
+      </button>
+
+      <div className="w-px h-6 bg-gray-700" />
+
       {/* Arguments Group */}
       <div className="flex items-center gap-3">
         <span className="text-xs text-gray-500 uppercase tracking-wider">Arguments</span>
